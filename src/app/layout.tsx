@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Inter } from "next/font/google";
 import "./globals.css";
-
+import { DarkThemeToggle, Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle, ThemeModeScript } from "flowbite-react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,7 +17,28 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <head>
+        <ThemeModeScript />
+      </head>
+      <body className={inter.className}>
+        <Navbar fluid>
+          <NavbarBrand as={Link} href="#">
+            {/* <img src="/favicon.svg" className="mr-3 h-6 sm:h-9" alt="Logo" /> */}
+            <span className="self-center whitespace-nowrap text-xl font-semibold text-gray-700 dark:text-white">Lära svenska</span>
+          </NavbarBrand>
+          <NavbarToggle />
+          <NavbarCollapse>
+            <NavbarLink as={Link} href="/articles">
+              Articles
+            </NavbarLink>
+            <NavbarLink as={Link} href="/words">
+              Words
+            </NavbarLink>
+          </NavbarCollapse>
+          {/* <DarkThemeToggle /> */}
+        </Navbar>
+        <main className="mx-auto w-full max-w-8xl lg:flex lg:px-4">{children}</main>
+      </body>
     </html>
   );
 }

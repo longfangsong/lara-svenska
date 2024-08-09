@@ -3,6 +3,12 @@
     "next/core-web-vitals",
     "plugin:eslint-plugin-next-on-pages/recommended"
   ],
+  "rules": {
+    "semi": [
+      2,
+      "never"
+    ]
+  },
   "plugins": [
     "eslint-plugin-next-on-pages"
   ]

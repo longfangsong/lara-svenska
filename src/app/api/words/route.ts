@@ -158,7 +158,7 @@ async function putIntoDB(db_client: D1Database, spell: string, word: WordVoiceFe
 }
 
 export async function GET(request: NextRequest) {
-    const spell = request.nextUrl.searchParams.get("spell")!;
+    const spell = request.nextUrl.searchParams.get("spell")!.toLocaleLowerCase();
     try {
         const db = getRequestContext().env.DB;
         const db_result = await getFromDB(db, spell);

@@ -11,12 +11,15 @@ async function fetch_single_article(title: string, url: string, db: D1Database) 
   const details = $(".article-details__section p")
     .map((_, it) => $(it).text())
     .toArray();
+  const audio_id = $(".audio-button").attr('data-audio-id')!;
+  const audio_url_response = await fetch(`https://sverigesradio.se/playerajax/audio?id=${audio_id}&type=publication&publicationid=${audio_id}&quality=high`);
+  const { audioUrl } = await audio_url_response.json<{ audioUrl: string }>();
   details.pop();
   content += details.join("");
   const create_time = new Date($("time.publication-metadata__item").attr('datetime') || '');
   const id = crypto.randomUUID();
-  const stmt = db.prepare('INSERT INTO Article (id, title, content, create_time, url) VALUES (?1, ?2, ?3, ?4, ?5);');
-  await stmt.bind(id, title, content, create_time.getTime(), url).run();
+  const stmt = db.prepare('INSERT INTO Article (id, title, content, create_time, url, voice_url) VALUES (?1, ?2, ?3, ?4, ?5, ?6);');
+  await stmt.bind(id, title, content, create_time.getTime(), url, audioUrl).run();
 }
 
 async function title_exists(title: string, db: D1Database): Promise<boolean> {
@@ -42,7 +45,7 @@ export async function GET(request: NextRequest) {
   const db = getRequestContext().env.DB;
   const id = request.nextUrl.searchParams.get("id");
   if (id !== null) {
-    const stmt = db.prepare("SELECT id, title, url, create_time, content FROM Article WHERE id=?1;");
+    const stmt = db.prepare("SELECT id, title, url, create_time, content, voice_url FROM Article WHERE id=?1;");
     const result = await stmt.bind(id).first();
     return NextResponse.json(result);
   } else {

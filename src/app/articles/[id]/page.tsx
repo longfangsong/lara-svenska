@@ -4,6 +4,8 @@ import { Button, Popover, Spinner } from "flowbite-react";
 import Link from "next/link";
 import { toWordsAndPunctuations } from "@/article";
 import { WordPopover } from "./WordPopover";
+import { Player } from "./Player";
+
 export const runtime = 'edge';
 
 function Sentence({ content }: { content: Array<string> }) {
@@ -34,6 +36,7 @@ export default async function Article({ params }: { params: { id: string } }) {
         <Button className="w-fit my-1" as={Link} href={`https://sverigesradio.se${article.url}`}>
             On origin site
         </Button>
+        <Player url={article.voice_url}></Player>
         {sentences.map(sentence => <Sentence key={sentence.join('-')} content={sentence}></Sentence>)}
     </div>
 }

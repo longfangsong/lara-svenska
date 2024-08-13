@@ -49,5 +49,6 @@ export interface Article {
     title: string,
     content: string,
     create_time: number,
-    url: string
+    url: string,
+    voice_url: string,
 }

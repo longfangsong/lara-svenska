@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@supercharge/promise-pool": "^3.2.0",
+    "@wavesurfer/react": "^1.0.7",
     "cheerio": "1.0.0-rc.12",
     "flowbite": "^2.4.1",
     "flowbite-react": "^0.10.1",
@@ -22,7 +23,8 @@
     "next-auth": "^4.24.7",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^5.2.1"
+    "react-icons": "^5.2.1",
+    "wavesurfer.js": "^7.8.2"
   },
   "devDependencies": {
     "@cloudflare/next-on-pages": "^1.13.1",

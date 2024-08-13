@@ -1,5 +1,5 @@
 "use client";
-import { Word, voice_fetched } from "@/types";
+import { Word } from "@/types";
 import { Button, Popover, Spinner } from "flowbite-react";
 import { useState } from "react";
 import { RiUserVoiceLine } from "react-icons/ri";
@@ -27,7 +27,7 @@ export function WordPopover({ word }: { word: string }) {
         content={
             loading ?
                 <Spinner aria-label="Default status example" size="xl" /> :
-                <div className="text-black p-1">
+                <div className="text-black p-1 max-h-72 overflow-scroll">
                     {wordInfo?.map((w, i) => {
                         return <><div className="hover:bg-sky-100">
                             <div className="flex justify-between ...">

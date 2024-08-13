@@ -27,9 +27,9 @@ export function WordPopover({ word }: { word: string }) {
         content={
             loading ?
                 <Spinner aria-label="Default status example" size="xl" /> :
-                <div className="text-black p-1 max-h-72 overflow-scroll">
+                <div className="p-1 max-h-72 overflow-scroll">
                     {wordInfo?.map((w, i) => {
-                        return <><div className="hover:bg-sky-100">
+                        return <><div className="hover:bg-sky-100 dark:hover:bg-slate-800">
                             <div className="flex justify-between ...">
                                 <h2 className="text-xl font-semibold">{w.spell}</h2>
                                 <Button className="ml-3 p-0" onClick={() => {
@@ -47,7 +47,7 @@ export function WordPopover({ word }: { word: string }) {
                             </div>
                             <p className="italic">/{w.pronunciation}/</p>
                             {w.meanings.map((meaning, ii) => {
-                                return <><div className="hover:bg-sky-200">
+                                return <><div className="hover:bg-sky-200 dark:hover:bg-slate-700">
                                     <p className="font-medium">{meaning.part_of_speech}</p>
                                     <p>{meaning.meaning}</p>
                                     {meaning.example_sentence ?
@@ -67,6 +67,6 @@ export function WordPopover({ word }: { word: string }) {
                 </div >
         }
     >
-        <a className="hover:bg-sky-700 cursor-pointer">{word}</a>
+        <a className="hover:bg-sky-300 dark:hover:bg-sky-700 cursor-pointer">{word}</a>
     </Popover >
 }

@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { findWord } from "@/dictionary"
 import { SingleMeaningWord, Word, WordMeaning, WordVoiceFetched } from "@/types";
 import { getRequestContext } from "@cloudflare/next-on-pages";
-import { load } from "cheerio";
 import he from 'he';
 
 export const runtime = 'edge';

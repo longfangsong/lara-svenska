@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "flowbite-react";
 import { RiUserVoiceLine } from "react-icons/ri";
-import { Voice } from "../../types";
+import { Voice } from "@/types";
 
 export function PlayButton({ voice }: { voice: Voice }) {
   return (

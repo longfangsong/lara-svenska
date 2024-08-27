@@ -4,7 +4,7 @@ import {
   WordMeaning,
   WordReviewWithWordDetail,
   WordReviewWithWordDetailAndMeaning,
-} from "../../types";
+} from "@/types";
 import {
   Table,
   TableBody,
@@ -13,7 +13,7 @@ import {
   TableHeadCell,
   TableRow,
 } from "flowbite-react";
-import { PlayButton } from "@/_components/PlayButton";
+import { PlayButton } from "@/app/_components/PlayButton";
 
 export const runtime = "edge";
 

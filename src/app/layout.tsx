@@ -10,9 +10,9 @@ import {
   NavbarLink,
   ThemeModeScript,
 } from "flowbite-react";
-import { auth } from "@/auth";
-import { SignInButton } from "@/_components/auth/SignInButton";
-import { SignOutButton } from "@/_components/auth/SignOutButton";
+import { auth } from "@/app/auth";
+import { SignInButton } from "@/app/_components/auth/SignInButton";
+import { SignOutButton } from "@/app/_components/auth/SignOutButton";
 const inter = Inter({ subsets: ["latin", "latin-ext"] });
 
 export const metadata: Metadata = {

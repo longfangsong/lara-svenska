@@ -1,5 +1,5 @@
 import { Button } from "flowbite-react";
-import { signIn } from "@/auth";
+import { signIn } from "@/app/auth";
 
 export async function SignInButton() {
   return (

@@ -2,8 +2,8 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { Article as ArticleType } from "../../../types";
 import { Button } from "flowbite-react";
 import Link from "next/link";
-import { Player } from "@/_components/Player";
-import { WordPopover } from "@/_components/WordPopover";
+import { Player } from "@/app/_components/Player";
+import { WordPopover } from "@/app/_components/WordPopover";
 import React from "react";
 
 export const runtime = "edge";
@@ -125,7 +125,3 @@ export default async function Article({
     return <></>;
   }
 }
-
-// {await Promise.all(
-//   sentences.map(async (sentence) => await Sentence(sentence, article.id)),
-// )}

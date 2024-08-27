@@ -10,7 +10,7 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import React from "react";
 import { PlayButton } from "./PlayButton";
 import { SaveToWordBook } from "./SaveToWordBook";
-import { auth } from "@/auth";
+import { auth } from "@/app/auth";
 export const runtime = "edge";
 
 function processQueryResults(
@@ -97,7 +97,7 @@ async function SingleWord({
       {word.meanings?.map((meaning: WordMeaning, meaning_index: number) => {
         return (
           <React.Fragment key={meaning_index}>
-            <div className="hover:bg-sky-200 dark:hover:bg-slate-700">
+            <div className="hover:bg-sky-200 dark:hover:bg-slate-700 p-2">
               <div className="flex justify-between">
                 <h2 className="text-xl font-semibold">{word.spell}</h2>
                 <div className="flex">
@@ -156,7 +156,7 @@ async function WordPopoverContent({
   }
   return (
     <>
-      <div className="p-1 max-h-72 overflow-scroll">
+      <div className="max-h-72 overflow-scroll">
         {result.map((w, i) => {
           return (
             <React.Fragment key={i}>

@@ -1,5 +1,5 @@
 import { Button } from "flowbite-react";
-import { signOut } from "@/auth";
+import { signOut } from "@/app/auth";
 
 export async function SignOutButton() {
   return (

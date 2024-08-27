@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { WordReview } from "@/types";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { Session } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
@@ -69,6 +70,21 @@ export const POST = auth(async function POST(request: NextRequest) {
     in_article: string | undefined;
   }>();
   const db = getRequestContext().env.DB;
+  const existing = await db
+    .prepare(
+      `SELECT id, user_email,
+        word_id, query_count, review_count,
+        current_review_time
+    FROM WordReview
+    WHERE word_id = ?1 AND user_email = ?2;`,
+    )
+    .bind(payload.word_id, req.auth.user.email)
+    .first<WordReview>();
+  if (existing) {
+    return NextResponse.json(existing, {
+      status: 409,
+    });
+  }
   const id = crypto.randomUUID();
   await db
     .prepare(

@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { auth } from "@/app/auth";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import {
   WordMeaning,
@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "flowbite-react";
 import { PlayButton } from "@/app/_components/PlayButton";
+import BlurElement from "../_components/BlurElement";
 
 export const runtime = "edge";
 
@@ -62,6 +63,7 @@ export default async function Words() {
           <TableHeadCell>Word</TableHeadCell>
           <TableHeadCell>Query Count</TableHeadCell>
           <TableHeadCell>Review Count</TableHeadCell>
+          <TableHeadCell>Meaning</TableHeadCell>
           <TableHeadCell>Play</TableHeadCell>
         </TableHead>
         <TableBody className="divide-y">
@@ -80,6 +82,30 @@ export default async function Words() {
                 <TableCell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                   {review.review_count}
                 </TableCell>
+                <TableCell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                  {review.meanings.map((meaning, index) => {
+                    return (
+                      <div key={index}>
+                        <p className="font-medium text-sm">
+                          {meaning.part_of_speech}
+                        </p>
+                        <BlurElement>{meaning.meaning}</BlurElement>
+                        {meaning.example_sentence ? (
+                          <div>
+                            <p className="inline text-sm text-green-400">
+                              {meaning.example_sentence}
+                            </p>
+                            <BlurElement className="ml-2 inline text-sm text-sky-400">
+                              {meaning.example_sentence_meaning}
+                            </BlurElement>
+                          </div>
+                        ) : (
+                          <></>
+                        )}
+                      </div>
+                    );
+                  })}
+                </TableCell>
                 <TableCell>
                   <PlayButton voice={review}></PlayButton>
                 </TableCell>
@@ -91,5 +117,3 @@ export default async function Words() {
     </div>
   );
 }
-
-//

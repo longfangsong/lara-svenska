@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { auth } from "@/app/auth";
 import { WordReview } from "@/types";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 import { Session } from "next-auth";

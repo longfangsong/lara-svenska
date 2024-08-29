@@ -1,4 +1,4 @@
-import { auth } from "@/auth";
+import { auth } from "@/app/auth";
 import { Session } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
 import { Word, WordWithMeanings, WordWithSingleMeaning } from "../../../types";
@@ -163,6 +163,7 @@ async function putIntoDB(
 
 export const GET = auth(async function GET(request: NextRequest) {
   const req = request as NextRequest & { auth: Session };
+  console.log(req);
   if (!req.auth.user?.email) {
     return new NextResponse(null, { status: 401 });
   }

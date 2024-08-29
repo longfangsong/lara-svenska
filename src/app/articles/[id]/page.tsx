@@ -82,7 +82,10 @@ async function Sentence({
         } else {
           return (
             <React.Fragment key={i}>
-              <WordPopover key={i}>{w}</WordPopover>&nbsp;
+              <WordPopover key={i} article_id={article_id}>
+                {w}
+              </WordPopover>
+              &nbsp;
             </React.Fragment>
           );
         }

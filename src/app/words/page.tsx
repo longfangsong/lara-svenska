@@ -16,6 +16,7 @@ import {
 import { PlayButton } from "@/app/_components/PlayButton";
 import BlurElement from "../_components/BlurElement";
 import { ReviewButton } from "../_components/ReviewButton";
+import WordRow from "../_components/WordRow";
 
 export const runtime = "edge";
 
@@ -58,67 +59,22 @@ export default async function Words() {
     }),
   );
   return (
-    <div className="w-full">
-      <Table striped className="max-w-full">
+    <div className="max-w-full overflow-scroll">
+      <Table striped className="overflow-x-scroll">
         <TableHead>
           <TableHeadCell>Word</TableHeadCell>
-          <TableHeadCell>Query Count</TableHeadCell>
-          <TableHeadCell>Review Count</TableHeadCell>
+          <TableHeadCell>Query</TableHeadCell>
+          <TableHeadCell>Review</TableHeadCell>
           <TableHeadCell>Meaning</TableHeadCell>
           <TableHeadCell>Play</TableHeadCell>
           <TableHeadCell>Review</TableHeadCell>
         </TableHead>
-        <TableBody className="divide-y">
+        <TableBody>
           {result.map((review) => {
-            return (
-              <TableRow
-                key={review.id}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800"
-              >
-                <TableCell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {review.spell}
-                </TableCell>
-                <TableCell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {review.query_count}
-                </TableCell>
-                <TableCell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {review.review_count}
-                </TableCell>
-                <TableCell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                  {review.meanings.map((meaning, index) => {
-                    return (
-                      <div key={index}>
-                        <p className="font-medium text-sm">
-                          {meaning.part_of_speech}
-                        </p>
-                        <BlurElement>{meaning.meaning}</BlurElement>
-                        {meaning.example_sentence ? (
-                          <div>
-                            <p className="inline text-sm text-green-400">
-                              {meaning.example_sentence}
-                            </p>
-                            <BlurElement className="ml-2 inline text-sm text-sky-400">
-                              {meaning.example_sentence_meaning}
-                            </BlurElement>
-                          </div>
-                        ) : (
-                          <></>
-                        )}
-                      </div>
-                    );
-                  })}
-                </TableCell>
-                <TableCell>
-                  <PlayButton voice={review} />
-                </TableCell>
-                <TableCell>
-                  <ReviewButton review={review} />
-                </TableCell>
-              </TableRow>
-            );
+            return <WordRow key={review.id} review={review} />;
           })}
         </TableBody>
       </Table>
-    </div>
+    </div >
   );
 }

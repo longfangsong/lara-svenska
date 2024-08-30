@@ -1,6 +1,6 @@
 "use client";
 import React, { useCallback, useEffect } from "react";
-import { Button, Checkbox, Label, ToggleSwitch } from "flowbite-react";
+import { Button, ToggleSwitch } from "flowbite-react";
 import { useRef, useState } from "react";
 import {
   IoIosPause,

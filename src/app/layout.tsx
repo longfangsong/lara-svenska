@@ -8,6 +8,7 @@ import {
   NavbarBrand,
   NavbarCollapse,
   NavbarLink,
+  NavbarToggle,
   ThemeModeScript,
 } from "flowbite-react";
 import { auth } from "@/app/auth";
@@ -47,6 +48,7 @@ async function NavBar() {
         ) : (
           <SignInButton />
         )}
+        <NavbarToggle />
       </div>
       <NavbarCollapse>
         <NavbarLink href={process.env.CF_PAGES_URL + "/articles"}>

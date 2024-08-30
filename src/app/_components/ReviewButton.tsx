@@ -17,6 +17,7 @@ async function updateWordReview(review: WordReview) {
 }
 export function ReviewButton({
   review,
+  onClick
 }: {
   review: WordReview;
   onClick?: () => void;
@@ -24,8 +25,9 @@ export function ReviewButton({
   return (
     <Button
       className="ml-3 p-0"
-      onClick={() => {
+      onClick={async () => {
         updateWordReview(review);
+        onClick && onClick();
       }}
     >
       <IoCheckmarkDoneOutline className="h-4 w-4" />

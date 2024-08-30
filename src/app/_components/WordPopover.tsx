@@ -304,15 +304,15 @@ async function WordPopoverContent({
   if (dbResult.length !== 0) {
     result = dbResult;
   } else {
-    const session = await auth();
-    if (session) {
-      const ai = getRequestContext().env.AI;
-      const ai_result = await getFromAI(ai, spell);
-      if (ai_result) {
-        await putIntoDB(db, spell, ai_result);
-        result = [ai_result];
-      }
-    }
+    // const session = await auth();
+    // if (session) {
+    //   const ai = getRequestContext().env.AI;
+    //   const ai_result = await getFromAI(ai, spell);
+    //   if (ai_result) {
+    //     await putIntoDB(db, spell, ai_result);
+    //     result = [ai_result];
+    //   }
+    // }
   }
   return (
     <>

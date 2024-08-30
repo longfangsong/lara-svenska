@@ -15,6 +15,7 @@ import {
 } from "flowbite-react";
 import { PlayButton } from "@/app/_components/PlayButton";
 import BlurElement from "../_components/BlurElement";
+import { ReviewButton } from "../_components/ReviewButton";
 
 export const runtime = "edge";
 
@@ -57,14 +58,15 @@ export default async function Words() {
     }),
   );
   return (
-    <div className="w-full overflow-x-auto">
-      <Table striped>
+    <div className="w-full">
+      <Table striped className="max-w-full">
         <TableHead>
           <TableHeadCell>Word</TableHeadCell>
           <TableHeadCell>Query Count</TableHeadCell>
           <TableHeadCell>Review Count</TableHeadCell>
           <TableHeadCell>Meaning</TableHeadCell>
           <TableHeadCell>Play</TableHeadCell>
+          <TableHeadCell>Review</TableHeadCell>
         </TableHead>
         <TableBody className="divide-y">
           {result.map((review) => {
@@ -107,7 +109,10 @@ export default async function Words() {
                   })}
                 </TableCell>
                 <TableCell>
-                  <PlayButton voice={review}></PlayButton>
+                  <PlayButton voice={review} />
+                </TableCell>
+                <TableCell>
+                  <ReviewButton review={review} />
                 </TableCell>
               </TableRow>
             );

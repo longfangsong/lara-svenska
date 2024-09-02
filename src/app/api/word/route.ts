@@ -6,6 +6,54 @@ import he from "he";
 import { getRequestContext } from "@cloudflare/next-on-pages";
 
 export const runtime = "edge";
+function processQueryResults(
+  rawResults: WordWithSingleMeaning[],
+): Array<WordWithMeanings> {
+  const wordMap = new Map<string, WordWithMeanings>();
+  rawResults.forEach((row) => {
+    if (!wordMap.has(row.id)) {
+      wordMap.set(row.id, {
+        ...row,
+        meanings: [],
+      });
+    }
+    wordMap.get(row.id)!.meanings.push({
+      part_of_speech: row.part_of_speech,
+      meaning: row.meaning,
+      example_sentence: row.example_sentence,
+      example_sentence_meaning: row.example_sentence_meaning,
+    });
+  });
+
+  return Array.from(wordMap.values());
+}
+
+async function getFromDB(
+  db_client: D1Database,
+  spell: string,
+): Promise<Array<WordWithMeanings> | null> {
+  const sql = `
+    SELECT  Word.id, Word.spell, Word.pronunciation, Word.pronunciation_voice,
+            Word.pronunciation_voice_url,
+            WordMeaning.part_of_speech, WordMeaning.meaning,
+            WordMeaning.example_sentence, WordMeaning.example_sentence_meaning
+    FROM    WordVariant, Word, WordMeaning
+    WHERE   WordVariant.spell=?1 AND
+            Word.id=WordVariant.word_id AND
+            Word.id=WordMeaning.word_id;`;
+  try {
+    const rawResults = await db_client
+      .prepare(sql)
+      .bind(spell)
+      .all<WordWithSingleMeaning>();
+    if (!rawResults.results) {
+      return [];
+    }
+    return processQueryResults(rawResults.results);
+  } catch (e) {
+    return null;
+  }
+}
 
 async function fetchPronunciation(spell: string): Promise<ArrayBuffer> {
   const url = `https://ttsmp3.com/makemp3_new.php`;
@@ -163,13 +211,16 @@ async function putIntoDB(
 
 export const GET = auth(async function GET(request: NextRequest) {
   const req = request as NextRequest & { auth: Session };
-  console.log(req);
   if (!req.auth.user?.email) {
     return new NextResponse(null, { status: 401 });
   }
   const spell = request.nextUrl.searchParams.get("spell")!.toLocaleLowerCase();
   const db = getRequestContext().env.DB;
   const ai_client = getRequestContext().env.AI;
+  const db_result = await getFromDB(db, spell);
+  if (db_result !== null) {
+    return NextResponse.json(db_result);
+  }
   const ai_result = await getFromAI(ai_client, spell);
   if (ai_result !== undefined) {
     await putIntoDB(db, spell, ai_result);

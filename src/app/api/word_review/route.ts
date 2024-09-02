@@ -104,3 +104,26 @@ export const POST = auth(async function POST(request: NextRequest) {
   }
   return NextResponse.json(id);
 });
+
+export const GET = auth(async function GET(request: NextRequest) {
+  const req = request as NextRequest & { auth: Session };
+  if (!req.auth.user?.email) {
+    return new NextResponse(null, { status: 401 });
+  }
+  const db = getRequestContext().env.DB;
+  const word_id = request.nextUrl.searchParams.get("word_id");
+  const result = await db
+    .prepare(
+      `SELECT id, user_email,
+          word_id, query_count, review_count,
+          current_review_time
+      FROM WordReview
+      WHERE word_id = ?1 AND user_email = ?2;`,
+    )
+    .bind(word_id, req.auth.user.email)
+    .first<WordReview>();
+  if (result) {
+    return NextResponse.json(result);
+  }
+  return NextResponse.json(null);
+});

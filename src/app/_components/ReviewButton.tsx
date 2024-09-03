@@ -28,7 +28,7 @@ export function ReviewButton({
     <Button
       className="ml-3 p-0"
       onClick={async () => {
-        updateWordReview(review);
+        await updateWordReview(review);
         onClick && onClick();
         setClicked(true);
       }}

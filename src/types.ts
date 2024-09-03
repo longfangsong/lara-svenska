@@ -40,6 +40,7 @@ export interface WordReview {
   query_count: number;
   review_count: number;
   current_review_time: number;
+  next_review_time: number;
 }
 
 export type WordReviewWithWordDetail = WordReview & Omit<Word, "id">;

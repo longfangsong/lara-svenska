@@ -2,6 +2,7 @@
 import { Button } from "flowbite-react";
 import { Word, WordReview } from "@/types";
 import { RiStickyNoteAddLine } from "react-icons/ri";
+import { useState } from "react";
 
 export function SaveToWordBook({
   review,
@@ -12,6 +13,7 @@ export function SaveToWordBook({
   word: Word | undefined;
   article_id: string;
 }) {
+  const [clicked, setClicked] = useState(false);
   return (
     <Button
       className="ml-3 p-0"
@@ -21,7 +23,9 @@ export function SaveToWordBook({
         } else {
           updateWordReview(review, article_id);
         }
+        setClicked(true);
       }}
+      disabled={clicked}
     >
       <RiStickyNoteAddLine className="h-4 w-4" />
     </Button>

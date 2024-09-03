@@ -1,7 +1,7 @@
 "use client";
 import { WordReview } from "@/types";
 import { Button } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoCheckmarkDoneOutline } from "react-icons/io5";
 async function updateWordReview(review: WordReview) {
   const payload = {
@@ -24,6 +24,20 @@ export function ReviewButton({
   onClick?: () => void;
 }) {
   const [clicked, setClicked] = useState(false);
+  const [isReviewable, setIsReviewable] = useState(false);
+
+  useEffect(() => {
+    const timeUntilReview = review.next_review_time - Date.now();
+    if (timeUntilReview <= 0) {
+      setIsReviewable(true);
+    } else {
+      const timerId = setTimeout(() => {
+        setIsReviewable(true);
+      }, timeUntilReview);
+      return () => clearTimeout(timerId);
+    }
+  }, [review.next_review_time]);
+
   return (
     <Button
       className="ml-3 p-0"
@@ -32,7 +46,7 @@ export function ReviewButton({
         onClick && onClick();
         setClicked(true);
       }}
-      disabled={clicked}
+      disabled={clicked || !isReviewable}
     >
       <IoCheckmarkDoneOutline className="h-4 w-4" />
     </Button>

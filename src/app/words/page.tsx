@@ -8,14 +8,10 @@ import {
 import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeadCell,
   TableRow,
 } from "flowbite-react";
-import { PlayButton } from "@/app/_components/PlayButton";
-import BlurElement from "../_components/BlurElement";
-import { ReviewButton } from "../_components/ReviewButton";
 import WordRow from "../_components/WordRow";
 
 export const runtime = "edge";
@@ -25,13 +21,25 @@ export default async function Words() {
   const session = await auth();
   const query_result = await db
     .prepare(
-      `SELECT WordReview.id, WordReview.user_email,
-        WordReview.word_id, WordReview.query_count, WordReview.review_count,
-        WordReview.current_review_time, Word.spell, Word.pronunciation,
-        Word.pronunciation_voice, Word.pronunciation_voice_url
-        FROM WordReview, Word
-        WHERE WordReview.word_id=Word.id AND WordReview.user_email=?1
-        ORDER BY query_count DESC;`,
+      `SELECT
+          WordReview.id as id,
+          WordReview.user_email as user_email,
+          WordReview.word_id as word_id,
+          WordReview.query_count as query_count,
+          WordReview.review_count as review_count,
+          WordReview.current_review_time as current_review_time,
+          Word.spell as spell,
+          Word.pronunciation as pronunciation,
+          Word.pronunciation_voice as pronunciation_voice,
+          Word.pronunciation_voice_url as pronunciation_voice_url,
+          WordReview.current_review_time +
+            60 * 60 * 1000 * ReviewTime.hours_after_last_review
+          AS next_review_time
+        FROM WordReview, Word, ReviewTime
+        WHERE WordReview.word_id=Word.id
+          AND WordReview.review_count=ReviewTime.current_review_count
+          AND WordReview.user_email=?1
+        ORDER BY WordReview.current_review_time DESC, query_count DESC;`,
     )
     .bind(session?.user?.email)
     .all<WordReviewWithWordDetail>();
@@ -64,6 +72,8 @@ export default async function Words() {
         <TableHead>
           <TableHeadCell>Word</TableHeadCell>
           <TableHeadCell>Query</TableHeadCell>
+          <TableHeadCell>Last Review Time</TableHeadCell>
+          <TableHeadCell>Next Review Start Time</TableHeadCell>
           <TableHeadCell>Review</TableHeadCell>
           <TableHeadCell>Meaning</TableHeadCell>
           <TableHeadCell>Play</TableHeadCell>
@@ -75,6 +85,6 @@ export default async function Words() {
           })}
         </TableBody>
       </Table>
-    </div >
+    </div>
   );
 }

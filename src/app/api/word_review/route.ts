@@ -74,9 +74,14 @@ export const POST = auth(async function POST(request: NextRequest) {
     .prepare(
       `SELECT id, user_email,
         word_id, query_count, review_count,
-        current_review_time
-    FROM WordReview
-    WHERE word_id = ?1 AND user_email = ?2;`,
+        current_review_time,
+        WordReview.current_review_time +
+            60 * 60 * 1000 * ReviewTime.hours_after_last_review
+        AS next_review_time
+    FROM WordReview, ReviewTime
+    WHERE word_id = ?1
+      AND user_email = ?2
+      AND WordReview.review_count = ReviewTime.current_review_count;`,
     )
     .bind(payload.word_id, req.auth.user.email)
     .first<WordReview>();
@@ -86,12 +91,13 @@ export const POST = auth(async function POST(request: NextRequest) {
     });
   }
   const id = crypto.randomUUID();
+  const now = new Date();
   await db
     .prepare(
       `INSERT INTO WordReview (id, user_email, word_id, query_count, review_count, current_review_time)
           VALUES (?1, ?2, ?3, ?4, ?5, ?6);`,
     )
-    .bind(id, req.auth.user.email, payload.word_id, 1, 0, null)
+    .bind(id, req.auth.user.email, payload.word_id, 1, 0, now.getTime())
     .run();
   if (payload.in_article) {
     await db

@@ -24,6 +24,12 @@ export default function WordRow({
         {currentReview.query_count}
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
+        {new Date(currentReview.current_review_time).toLocaleString('sv-SE', { timeZone: 'UTC' })}
+      </TableCell>
+      <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
+        {new Date(currentReview.next_review_time).toLocaleString('sv-SE', { timeZone: 'UTC' })}
+      </TableCell>
+      <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {currentReview.review_count}
       </TableCell>
       <TableCell className="p-2 md:p-4 overflow-scroll whitespace-nowrap font-medium text-gray-900 dark:text-white">

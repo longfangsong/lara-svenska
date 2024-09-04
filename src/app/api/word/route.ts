@@ -186,10 +186,10 @@ async function putIntoDB(
             meaning.part_of_speech || null,
             he.decode(meaning.meaning),
             (meaning.example_sentence && he.decode(meaning.example_sentence)) ||
-              null,
+            null,
             (meaning.example_sentence_meaning &&
               he.decode(meaning.example_sentence_meaning)) ||
-              null,
+            null,
           )
           .run();
       } catch {
@@ -218,7 +218,7 @@ export const GET = auth(async function GET(request: NextRequest) {
   const db = getRequestContext().env.DB;
   const ai_client = getRequestContext().env.AI;
   const db_result = await getFromDB(db, spell);
-  if (db_result !== null) {
+  if (db_result !== null && db_result.length !== 0) {
     return NextResponse.json(db_result);
   }
   const ai_result = await getFromAI(ai_client, spell);

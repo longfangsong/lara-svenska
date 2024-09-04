@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Player } from "@/app/_components/Player";
 import { WordPopover } from "@/app/_components/WordPopover";
 import React from "react";
+import { dbSemaphore } from "@/lib";
 
 export const runtime = "edge";
 
@@ -103,7 +104,9 @@ export default async function Article({
   const stmt = db.prepare(
     "SELECT id, title, url, create_time, content, voice_url FROM Article WHERE id=?1;",
   );
+  const release = await dbSemaphore.acquire();
   const article = await stmt.bind(id).first<ArticleType>();
+  release();
   if (article) {
     const sentences = toWordsAndPunctuations(article.content);
     return (

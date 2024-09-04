@@ -13,12 +13,14 @@ import {
   TableRow,
 } from "flowbite-react";
 import WordRow from "../_components/WordRow";
+import { dbSemaphore } from "@/lib";
 
 export const runtime = "edge";
 
 export default async function Words() {
   const db = getRequestContext().env.DB;
   const session = await auth();
+  const release = await dbSemaphore.acquire();
   const query_result = await db
     .prepare(
       `SELECT
@@ -43,8 +45,10 @@ export default async function Words() {
     )
     .bind(session?.user?.email)
     .all<WordReviewWithWordDetail>();
+  release();
   const result: Array<WordReviewWithWordDetailAndMeaning> = await Promise.all(
     query_result.results.map(async (it) => {
+      const release = await dbSemaphore.acquire();
       // fill meanings
       const meaning_result = await db
         .prepare(
@@ -55,14 +59,17 @@ export default async function Words() {
         )
         .bind(it.word_id)
         .all<WordMeaning>();
+      release();
       const meaning_filled = { ...it, meanings: meaning_result.results };
       // fill in articles
+      const release2 = await dbSemaphore.acquire();
       const in_articles_result = await db
         .prepare(
           `SELECT article_id FROM WordReviewInArticle WHERE review_id=?1;`,
         )
         .bind(it.id)
         .all<string>();
+      release2();
       return { ...meaning_filled, in_articles: in_articles_result.results };
     }),
   );

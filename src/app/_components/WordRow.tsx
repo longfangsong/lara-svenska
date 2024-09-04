@@ -6,12 +6,47 @@ import { PlayButton } from "./PlayButton";
 import { ReviewButton } from "./ReviewButton";
 import { useState } from "react";
 
+const REVIEW_TIME_MAP: { [key: number]: number } = {
+  0: 1,
+  1: 24,
+  2: 2 * 24,
+  3: 3 * 24,
+  4: 8 * 24,
+  5: 15 * 24,
+  6: 0
+};
+
 export default function WordRow({
   review,
 }: {
   review: WordReviewWithWordDetailAndMeaning;
 }) {
   const [currentReview, setCurrentReview] = useState(review);
+  const [currentReviewTime, setCurrentReviewTime] = useState(review.current_review_time);
+  const [nextReviewTime, setNextReviewTime] = useState<number | null>(review.next_review_time);
+
+  const handleReview = () => {
+    const newReviewCount = currentReview.review_count + 1;
+    const newCurrentReviewTime = new Date().getTime();
+
+    let hoursToAdd: number | null = null;
+    if (newReviewCount in REVIEW_TIME_MAP) {
+      hoursToAdd = REVIEW_TIME_MAP[newReviewCount];
+    } else if (6 in REVIEW_TIME_MAP) {
+      hoursToAdd = null;
+    }
+
+    const newNextReviewTime = hoursToAdd ?
+      (newCurrentReviewTime + hoursToAdd * 60 * 60 * 1000) : null;
+
+    setCurrentReview({
+      ...currentReview,
+      review_count: newReviewCount,
+    });
+    setCurrentReviewTime(newCurrentReviewTime);
+    setNextReviewTime(newNextReviewTime);
+  };
+
   return (
     <TableRow
       key={review.id}
@@ -24,10 +59,10 @@ export default function WordRow({
         {currentReview.query_count}
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
-        {new Date(currentReview.current_review_time).toLocaleString('sv-SE', { timeZone: 'UTC' })}
+        {new Date(currentReviewTime).toLocaleString('sv-SE', { timeZone: 'UTC' })}
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
-        {new Date(currentReview.next_review_time).toLocaleString('sv-SE', { timeZone: 'UTC' })}
+        {nextReviewTime ? new Date(nextReviewTime).toLocaleString('sv-SE', { timeZone: 'UTC' }) : 'You may have remembered this word'}
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {currentReview.review_count}
@@ -58,12 +93,7 @@ export default function WordRow({
         <PlayButton voice={currentReview} />
       </TableCell>
       <TableCell className="p-2 md:p-4">
-        <ReviewButton review={currentReview} onClick={() => {
-          setCurrentReview({
-            ...currentReview,
-            review_count: currentReview.review_count + 1,
-          });
-        }} />
+        <ReviewButton review={currentReview} onClick={handleReview} />
       </TableCell>
     </TableRow>
   );

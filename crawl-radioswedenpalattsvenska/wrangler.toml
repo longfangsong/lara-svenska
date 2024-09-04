@@ -1,0 +1,12 @@
+name = "crawl-radioswedenpalattsvenska"
+main = "src/index.js"
+compatibility_date = "2024-08-15"
+workers_dev = true
+
+[triggers]
+crons = [ "0 */3 * * *" ]
+
+[[d1_databases]]
+binding = "DB"
+database_id = "7537276d-d1f7-46af-9b52-23657c9ba8d8"
+database_name = "svenska"

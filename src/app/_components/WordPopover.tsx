@@ -13,6 +13,7 @@ import { SaveToWordBook } from "./SaveToWordBook";
 import { auth } from "@/app/auth";
 import he from "he";
 import { WordPopoverContentClient } from "./WordPopoverContentClient";
+import { dbSemaphore } from "@/lib";
 
 export const runtime = "edge";
 
@@ -52,10 +53,12 @@ async function getFromDB(
             Word.id=WordVariant.word_id AND
             Word.id=WordMeaning.word_id;`;
   try {
+    const release = await dbSemaphore.acquire();
     const rawResults = await db_client
       .prepare(sql)
       .bind(spell)
       .all<WordWithSingleMeaning>();
+    release();
     if (!rawResults.results) {
       return [];
     }
@@ -76,10 +79,12 @@ async function getReview(
   FROM WordReview
   WHERE word_id = ?1 AND user_email = ?2;`;
   try {
+    const release = await dbSemaphore.acquire();
     const rawResults = await db_client
       .prepare(sql)
       .bind(word.id, session?.user?.email)
       .first<WordReview>();
+    release();
     return rawResults;
   } catch (e) {
     return null;
@@ -145,11 +150,9 @@ async function WordPopoverContent({
   const db = getRequestContext().env.DB;
   let result: Array<WordWithMeanings> = [];
   const dbResult = await getFromDB(db, spell);
-  if (dbResult === null) {
-    console.log("no db result:", spell);
+  if (dbResult === null || dbResult.length === 0) {
     return <WordPopoverContentClient spell={spell} article_id={article_id} />;
-  }
-  if (dbResult.length !== 0) {
+  } else {
     return (
       <div className="max-h-72 overflow-scroll">
         {dbResult.map((w, i) => {

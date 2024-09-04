@@ -41,7 +41,7 @@ export default async function Words() {
         WHERE WordReview.word_id=Word.id
           AND WordReview.review_count=ReviewTime.current_review_count
           AND WordReview.user_email=?1
-        ORDER BY WordReview.current_review_time DESC, query_count DESC;`,
+        ORDER BY next_review_time ASC, query_count DESC;`,
     )
     .bind(session?.user?.email)
     .all<WordReviewWithWordDetail>();
@@ -79,8 +79,8 @@ export default async function Words() {
         <TableHead>
           <TableHeadCell>Word</TableHeadCell>
           <TableHeadCell>Query</TableHeadCell>
-          <TableHeadCell>Last Review Time</TableHeadCell>
-          <TableHeadCell>Next Review Start Time</TableHeadCell>
+          {/* <TableHeadCell>Last Review Time</TableHeadCell>
+          <TableHeadCell>Next Review Start Time</TableHeadCell> */}
           <TableHeadCell>Review</TableHeadCell>
           <TableHeadCell>Meaning</TableHeadCell>
           <TableHeadCell>Play</TableHeadCell>

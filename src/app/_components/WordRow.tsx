@@ -47,6 +47,7 @@ export default function WordRow({
     setNextReviewTime(newNextReviewTime);
   };
 
+  const reviewCountColor = ['bg-red-500', 'bg-red-400', 'bg-orange-400', 'bg-yellow-500', 'bg-yellow-400', 'bg-green-400', 'bg-green-500'];
   return (
     <TableRow
       key={review.id}
@@ -58,14 +59,25 @@ export default function WordRow({
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {currentReview.query_count}
       </TableCell>
-      <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
+      {/* <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {new Date(currentReviewTime).toLocaleString('sv-SE', { timeZone: 'UTC' })}
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {nextReviewTime ? new Date(nextReviewTime).toLocaleString('sv-SE', { timeZone: 'UTC' }) : 'You may have remembered this word'}
-      </TableCell>
+      </TableCell> */}
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
-        {currentReview.review_count}
+        <div className="flex space-x-1">
+          {[...Array(7)].map((_, index) => (
+            <div
+              key={index}
+              className={`w-3 h-1 rounded-sm 
+                ${index < currentReview.review_count
+                  ? reviewCountColor[index]
+                  : 'bg-gray-300'
+                }`}
+            ></div>
+          ))}
+        </div>
       </TableCell>
       <TableCell className="p-2 md:p-4 overflow-scroll whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {currentReview.meanings.map((meaning, index) => {

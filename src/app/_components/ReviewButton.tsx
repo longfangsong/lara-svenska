@@ -1,4 +1,5 @@
 "use client";
+import { apiSemaphore } from "@/lib";
 import { WordReview } from "@/types";
 import { Button } from "flowbite-react";
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ async function updateWordReview(review: WordReview) {
     review_count: review.review_count + 1,
   };
   const param = new URLSearchParams({ id: review.id });
+  const release = await apiSemaphore.acquire();
   await fetch(`/api/word_review?${param}`, {
     method: "PATCH",
     headers: {
@@ -15,6 +17,7 @@ async function updateWordReview(review: WordReview) {
     },
     body: JSON.stringify(payload),
   });
+  await release();
 }
 export function ReviewButton({
   review,

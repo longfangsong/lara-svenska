@@ -3,6 +3,7 @@ import { Button } from "flowbite-react";
 import { Word, WordReview } from "@/types";
 import { RiStickyNoteAddLine } from "react-icons/ri";
 import { useState } from "react";
+import { apiSemaphore } from "@/lib";
 
 export function SaveToWordBook({
   review,
@@ -36,6 +37,7 @@ async function createWordReview(word: Word | undefined, article_id: string) {
     word_id: word!.id,
     in_article: article_id,
   };
+  const release = await apiSemaphore.acquire();
   const response = await fetch(`/api/word_review`, {
     method: "POST",
     headers: {
@@ -43,6 +45,7 @@ async function createWordReview(word: Word | undefined, article_id: string) {
     },
     body: JSON.stringify(payload),
   });
+  await release();
   if (response.status === 409) {
     const existingReview: WordReview = await response.json();
     updateWordReview(existingReview, article_id);
@@ -55,6 +58,7 @@ async function updateWordReview(review: WordReview, article_id: string) {
     in_article: article_id,
   };
   const param = new URLSearchParams({ id: review.id });
+  const release = await apiSemaphore.acquire();
   await fetch(`/api/word_review?${param}`, {
     method: "PATCH",
     headers: {
@@ -62,4 +66,5 @@ async function updateWordReview(review: WordReview, article_id: string) {
     },
     body: JSON.stringify(payload),
   });
+  await release();
 }

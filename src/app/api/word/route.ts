@@ -209,11 +209,8 @@ async function putIntoDB(
   }
 }
 
-export const GET = auth(async function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
   const req = request as NextRequest & { auth: Session };
-  if (!req.auth.user?.email) {
-    return new NextResponse(null, { status: 401 });
-  }
   const spell = request.nextUrl.searchParams.get("spell")!.toLocaleLowerCase();
   const db = getRequestContext().env.DB;
   const ai_client = getRequestContext().env.AI;
@@ -228,4 +225,4 @@ export const GET = auth(async function GET(request: NextRequest) {
   } else {
     return NextResponse.json(null, { status: 404 });
   }
-});
+}

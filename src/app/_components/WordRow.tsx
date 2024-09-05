@@ -5,6 +5,8 @@ import BlurElement from "./BlurElement";
 import { PlayButton } from "./PlayButton";
 import { ReviewButton } from "./ReviewButton";
 import { useState } from "react";
+import { formatDistance } from "date-fns/formatDistance";
+import { sv } from "date-fns/locale/sv";
 
 const REVIEW_TIME_MAP: { [key: number]: number } = {
   0: 1,
@@ -59,12 +61,13 @@ export default function WordRow({
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {currentReview.query_count}
       </TableCell>
-      {/* <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
-        {new Date(currentReviewTime).toLocaleString('sv-SE', { timeZone: 'UTC' })}
-      </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
-        {nextReviewTime ? new Date(nextReviewTime).toLocaleString('sv-SE', { timeZone: 'UTC' }) : 'You may have remembered this word'}
-      </TableCell> */}
+        {nextReviewTime ?
+          nextReviewTime < (new Date().getTime()) ?
+            'Now' :
+            `I ${formatDistance(nextReviewTime, new Date(), { locale: sv })}`
+          : 'You may have remembered this word'}
+      </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         <div className="flex space-x-1">
           {[...Array(7)].map((_, index) => (

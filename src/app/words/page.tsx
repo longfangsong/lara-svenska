@@ -79,8 +79,7 @@ export default async function Words() {
         <TableHead>
           <TableHeadCell>Word</TableHeadCell>
           <TableHeadCell>Query</TableHeadCell>
-          {/* <TableHeadCell>Last Review Time</TableHeadCell>
-          <TableHeadCell>Next Review Start Time</TableHeadCell> */}
+          <TableHeadCell>Next Review Time</TableHeadCell>
           <TableHeadCell>Review</TableHeadCell>
           <TableHeadCell>Meaning</TableHeadCell>
           <TableHeadCell>Play</TableHeadCell>

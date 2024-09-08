@@ -1,22 +1,13 @@
 "use client";
-import { WordReview, WordReviewWithWordDetailAndMeaning } from "@/types";
+import { WordReviewWithWordDetailAndMeaning } from "@/types";
 import { TableCell, TableRow } from "flowbite-react";
 import BlurElement from "./BlurElement";
 import { PlayButton } from "./PlayButton";
 import { ReviewButton } from "./ReviewButton";
-import { useState } from "react";
-import { formatDistance } from "date-fns/formatDistance";
+import { useEffect, useState } from "react";
 import { sv } from "date-fns/locale/sv";
-
-const REVIEW_TIME_MAP: { [key: number]: number } = {
-  0: 1,
-  1: 24,
-  2: 2 * 24,
-  3: 3 * 24,
-  4: 8 * 24,
-  5: 15 * 24,
-  6: 0
-};
+import { formatDistance } from "date-fns/formatDistance";
+import { REVIEW_HOURS_MAP } from "../lib/data";
 
 export default function WordRow({
   review,
@@ -26,15 +17,43 @@ export default function WordRow({
   const [currentReview, setCurrentReview] = useState(review);
   const [currentReviewTime, setCurrentReviewTime] = useState(review.current_review_time);
   const [nextReviewTime, setNextReviewTime] = useState<number | null>(review.next_review_time);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const updateInterval = () => {
+      if (nextReviewTime === null) return;
+
+      const timeUntilNextReview = nextReviewTime - now.getTime();
+
+      if (timeUntilNextReview < 60 * 1000) {
+        // Less than 1 minute, update every second
+        intervalId = setInterval(() => setNow(new Date()), 1000);
+      } else if (timeUntilNextReview < 60 * 60 * 1000) {
+        // Less than 1 hour, update every minute
+        intervalId = setInterval(() => setNow(new Date()), 60 * 1000);
+      } else {
+        // More than 1 hour, update every hour
+        intervalId = setInterval(() => setNow(new Date()), 60 * 60 * 1000);
+      }
+    };
+
+    updateInterval();
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [nextReviewTime, now]);
 
   const handleReview = () => {
     const newReviewCount = currentReview.review_count + 1;
     const newCurrentReviewTime = new Date().getTime();
 
     let hoursToAdd: number | null = null;
-    if (newReviewCount in REVIEW_TIME_MAP) {
-      hoursToAdd = REVIEW_TIME_MAP[newReviewCount];
-    } else if (6 in REVIEW_TIME_MAP) {
+    if (newReviewCount in REVIEW_HOURS_MAP) {
+      hoursToAdd = REVIEW_HOURS_MAP[newReviewCount];
+    } else if (6 in REVIEW_HOURS_MAP) {
       hoursToAdd = null;
     }
 
@@ -47,6 +66,7 @@ export default function WordRow({
     });
     setCurrentReviewTime(newCurrentReviewTime);
     setNextReviewTime(newNextReviewTime);
+    setNow(new Date());
   };
 
   const reviewCountColor = ['bg-red-500', 'bg-red-400', 'bg-orange-400', 'bg-yellow-500', 'bg-yellow-400', 'bg-green-400', 'bg-green-500'];
@@ -63,9 +83,9 @@ export default function WordRow({
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">
         {nextReviewTime ?
-          nextReviewTime < (new Date().getTime()) ?
-            'Now' :
-            `I ${formatDistance(nextReviewTime, new Date(), { locale: sv })}`
+          nextReviewTime < now.getTime() ?
+            'Nu' :
+            `I ${formatDistance(nextReviewTime, now, { locale: sv })}`
           : 'You may have remembered this word'}
       </TableCell>
       <TableCell className="p-2 md:p-4 whitespace-nowrap font-medium text-gray-900 dark:text-white">

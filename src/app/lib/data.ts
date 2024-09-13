@@ -13,36 +13,62 @@ export const REVIEW_HOURS_MAP: { [key: number]: number } = {
 
 export const WORDS_PER_PAGE = 10;
 
-export async function fetchWords(
+export async function fetchWordReviewWithDetails(
   db: D1Database,
+  snapshot_time: Date,
   user_email: string,
-  offset: number
+  offset: number,
 ): Promise<Array<WordReviewWithWordDetail>> {
   const release = await dbSemaphore.acquire();
   const result = await db
     .prepare(
       `SELECT
-          WordReview.id as id,
-          WordReview.user_email as user_email,
-          WordReview.word_id as word_id,
-          WordReview.query_count as query_count,
-          WordReview.review_count as review_count,
-          WordReview.current_review_time as current_review_time,
-          Word.spell as spell,
-          Word.pronunciation as pronunciation,
+    WordReview.id as id,
+    WordReview.user_email as user_email,
+    Word.spell as spell,
+    WordReview.word_id as word_id,
+    Word.pronunciation as pronunciation,
           Word.pronunciation_voice as pronunciation_voice,
           Word.pronunciation_voice_url as pronunciation_voice_url,
-          WordReview.current_review_time +
-            60 * 60 * 1000 * ReviewTime.hours_after_last_review
-          AS next_review_time
-        FROM WordReview, Word, ReviewTime
-        WHERE WordReview.word_id=Word.id
-          AND WordReview.review_count=ReviewTime.current_review_count
-          AND WordReview.user_email=?1
-        ORDER BY next_review_time ASC, query_count DESC
-        LIMIT ?2 OFFSET ?3;`
+    WordReview.query_count as query_count,
+    WordReview.review_count as review_count,
+    WordReview.last_review_time as last_review_time,
+    WordReview.last_last_review_time as last_last_review_time,
+      WordReview.last_review_time
+      + 60 * 60 * 1000 * ReviewTime.hours_after_last_review
+    AS next_review_time,
+    (CASE
+        WHEN WordReview.last_review_time > ?4
+        THEN WordReview.review_count - 1
+        ELSE WordReview.review_count
+    END) AS snapshot_review_count,
+    (CASE
+        WHEN WordReview.last_review_time > ?4
+        THEN WordReview.last_last_review_time
+          + 60 * 60 * 1000 * ReviewTimeSnapshot.hours_after_last_review
+        ELSE WordReview.last_review_time
+          + 60 * 60 * 1000 * ReviewTime.hours_after_last_review
+    END) AS snapshot_next_review_time,
+    ReviewTimeSnapshot.hours_after_last_review as snapshot_hours_after_last_review
+FROM Word
+JOIN WordReview ON WordReview.word_id = Word.id
+JOIN ReviewTime ON WordReview.review_count = ReviewTime.current_review_count
+LEFT JOIN ReviewTime AS ReviewTimeSnapshot ON ReviewTimeSnapshot.current_review_count = (
+    CASE
+        WHEN WordReview.last_review_time > ?4
+        THEN WordReview.review_count - 1
+        ELSE WordReview.review_count
+    END)
+WHERE WordReview.user_email=?1
+ORDER BY snapshot_next_review_time ASC, query_count DESC, id ASC
+LIMIT ?2 OFFSET ?3;`,
     )
-    .bind(user_email, WORDS_PER_PAGE, (offset - 1) * WORDS_PER_PAGE)
+    .bind(
+      user_email,
+      WORDS_PER_PAGE,
+      (offset - 1) * WORDS_PER_PAGE,
+      snapshot_time.getTime(),
+    )
     .all<WordReviewWithWordDetail>();
   release();
   return result.results;
@@ -50,7 +76,7 @@ export async function fetchWords(
 
 export async function fetchWordsCount(
   db: D1Database,
-  user_email: string
+  user_email: string,
 ): Promise<number> {
   const release = await dbSemaphore.acquire();
   const result = await db

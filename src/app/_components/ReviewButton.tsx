@@ -7,6 +7,7 @@ import { IoCheckmarkDoneOutline } from "react-icons/io5";
 async function updateWordReview(review: WordReview) {
   const payload = {
     review_count: review.review_count + 1,
+    last_review_time: new Date().getTime(),
   };
   const param = new URLSearchParams({ id: review.id });
   const release = await apiSemaphore.acquire();

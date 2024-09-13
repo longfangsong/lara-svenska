@@ -15,7 +15,7 @@ export default function WordRow({
   review: WordReviewWithWordDetailAndMeaning;
 }) {
   const [currentReview, setCurrentReview] = useState(review);
-  const [currentReviewTime, setCurrentReviewTime] = useState(review.current_review_time);
+  const [currentReviewTime, setCurrentReviewTime] = useState(review.last_review_time);
   const [nextReviewTime, setNextReviewTime] = useState<number | null>(review.next_review_time);
   const [now, setNow] = useState(new Date());
 

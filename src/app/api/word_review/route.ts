@@ -7,7 +7,7 @@ export const runtime = "edge";
 type PatchPayload = {
   query_count: number | undefined;
   review_count: number | undefined;
-  current_review_time: number | undefined;
+  last_review_time: number | undefined;
   in_article: string | undefined;
 };
 
@@ -15,15 +15,19 @@ function generateSQL(payload: PatchPayload): string {
   let result = "UPDATE WordReview SET";
   let current_index = 2;
   if (payload.query_count) {
-    result += ` query_count=?${current_index}\n`;
+    result += ` query_count=?${current_index},\n`;
     current_index++;
   }
   if (payload.review_count) {
-    result += ` review_count=?${current_index}\n`;
+    result += ` review_count=?${current_index},\n`;
     current_index++;
   }
-  if (payload.current_review_time) {
-    result += ` current_review_time=?${current_index}\n`;
+  if (payload.last_review_time) {
+    result += ` last_last_review_time=last_review_time, last_review_time=?${current_index},\n`;
+  }
+  result = result.trim();
+  if (result.endsWith(",")) {
+    result = result.slice(0, -1);
   }
   result += "WHERE id=?1;";
   return result;
@@ -42,7 +46,7 @@ export const PATCH = auth(async function PATCH(request: NextRequest) {
     id,
     payload.query_count,
     payload.review_count,
-    payload.current_review_time,
+    payload.last_review_time,
   ].filter((it) => it !== undefined);
   await db
     .prepare(update_sql)
@@ -74,8 +78,8 @@ export const POST = auth(async function POST(request: NextRequest) {
     .prepare(
       `SELECT id, user_email,
         word_id, query_count, review_count,
-        current_review_time,
-        WordReview.current_review_time +
+        last_review_time,
+        WordReview.last_review_time +
             60 * 60 * 1000 * ReviewTime.hours_after_last_review
         AS next_review_time
     FROM WordReview, ReviewTime
@@ -94,7 +98,7 @@ export const POST = auth(async function POST(request: NextRequest) {
   const now = new Date();
   await db
     .prepare(
-      `INSERT INTO WordReview (id, user_email, word_id, query_count, review_count, current_review_time)
+      `INSERT INTO WordReview (id, user_email, word_id, query_count, review_count, last_review_time)
           VALUES (?1, ?2, ?3, ?4, ?5, ?6);`,
     )
     .bind(id, req.auth.user.email, payload.word_id, 1, 0, now.getTime())
@@ -122,7 +126,7 @@ export const GET = auth(async function GET(request: NextRequest) {
     .prepare(
       `SELECT id, user_email,
           word_id, query_count, review_count,
-          current_review_time
+          last_review_time
       FROM WordReview
       WHERE word_id = ?1 AND user_email = ?2;`,
     )

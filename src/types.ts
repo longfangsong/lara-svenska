@@ -39,7 +39,7 @@ export interface WordReview {
   word_id: string;
   query_count: number;
   review_count: number;
-  current_review_time: number;
+  last_review_time: number;
   next_review_time: number;
 }
 

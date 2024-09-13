@@ -4,12 +4,12 @@ import { getRequestContext } from "@cloudflare/next-on-pages";
 import { TableHead, TableHeadCell, TableBody, Table } from "flowbite-react";
 import WordRow from "../_components/WordRow";
 import { auth } from "../auth";
-import { fetchWords } from "../lib/data";
+import { fetchWordReviewWithDetails } from "../lib/data";
 
-export default async function WordTable({page}:{page: number}) {
+export default async function WordTable({page, snapshot}:{page: number, snapshot: Date}) {
     const db = getRequestContext().env.DB;
     const session = await auth();
-    const query_result = await fetchWords(db, session?.user?.email!, page);
+    const query_result = await fetchWordReviewWithDetails(db, snapshot, session?.user?.email!, page);
     const result: Array<WordReviewWithWordDetailAndMeaning> = await Promise.all(
         query_result.map(async (it) => {
             const release = await dbSemaphore.acquire();

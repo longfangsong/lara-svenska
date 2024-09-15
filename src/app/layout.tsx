@@ -29,7 +29,7 @@ async function NavBar() {
       className="items-center justify-between border-b border-gray-200 bg-white text-gray-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
     >
       <NavbarBrand href={process.env.CF_PAGES_URL}>
-        <span className="self-center whitespace-nowrap text-xl font-semibold text-gray-900 dark:text-white">
+        <span className="self-center whitespace-nowrap text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           Lära Svenska
         </span>
       </NavbarBrand>
